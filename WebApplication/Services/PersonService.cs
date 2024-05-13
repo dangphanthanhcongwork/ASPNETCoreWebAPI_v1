@@ -1,9 +1,9 @@
 using WebApplication.Models;
 using System.Threading.Tasks;
 
-namespace WebApplication.Service
+namespace WebApplication.Services
 {
-    public class PersonService : IPersonService
+    public class PersonService
     {
         private static readonly List<Person> persons = new List<Person>
         {
