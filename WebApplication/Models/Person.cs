@@ -1,5 +1,11 @@
 namespace WebApplication.Models
 {
+    public enum Gender
+    {
+        Male,
+        Female,
+        Other
+    }
     public class Person
     {
         public Guid Id { get; set; }

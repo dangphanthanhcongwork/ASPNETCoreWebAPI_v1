@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.Models;
-using WebApplication.Service;
+using WebApplication.Services;
 using System;
 using System.Threading.Tasks;
 
@@ -10,9 +10,9 @@ namespace WebApplication.Controllers
     [Route("persons")]
     public class PersonsController : ControllerBase
     {
-        private readonly IPersonService _personService;
+        private readonly PersonService _personService;
 
-        public PersonsController(IPersonService personService)
+        public PersonsController(PersonService personService)
         {
             _personService = personService;
         }
