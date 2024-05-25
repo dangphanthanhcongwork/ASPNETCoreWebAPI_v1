@@ -1,73 +1,89 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.Models;
+using WebApplication.DTOs;
 using WebApplication.Services;
-using System;
-using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
+    [Route("api/persons")]
     [ApiController]
-    [Route("persons")]
     public class PersonsController : ControllerBase
     {
-        private readonly PersonService _personService;
+        private readonly IPersonService _service;
 
-        public PersonsController(PersonService personService)
+        public PersonsController(IPersonService service)
         {
-            _personService = personService;
+            _service = service;
         }
 
+        // GET: api/persons
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetPersons()
         {
-            return Ok(await _personService.Get());
+            var persons = await _service.GetPersons();
+            return Ok(persons);
         }
 
+        // GET: api/persons/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> GetPerson(Guid id)
         {
-            var person = await _personService.Get(id);
-            if (person == null)
+            try
             {
-                return NotFound();
+                var person = await _service.GetPerson(id);
+                return Ok(person);
             }
-            return Ok(person);
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Add(Person person)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            await _personService.Add(person);
-            return CreatedAtAction(nameof(Get), new { id = person.Id }, person);
-        }
-
+        // PUT: api/persons/{id}
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, Person person)
+        public async Task<IActionResult> PutPerson(Guid id, PersonDTO personDTO)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                await _service.PutPerson(id, personDTO);
+                return NoContent();
             }
-            await _personService.Update(id, person);
-            return NoContent();
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        // POST: api/persons
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<IActionResult> PostPerson(PersonDTO personDTO)
         {
-            await _personService.Delete(id);
-            return NoContent();
+            await _service.PostPerson(personDTO);
+            return CreatedAtAction(nameof(GetPerson), new { id = Guid.NewGuid() }, personDTO);
+        }
+
+        // DELETE: api/persons/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePerson(Guid id)
+        {
+            try
+            {
+                await _service.DeletePerson(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpGet("filter")]
-        public async Task<IActionResult> Filter([FromQuery] string firstName = null, [FromQuery] string lastName = null, [FromQuery] string gender = null, [FromQuery] string birthPlace = null)
+        public async Task<ActionResult<IEnumerable<Person>>> FilterPersons([FromQuery] string? name, [FromQuery] string? gender, [FromQuery] string? birthplace)
         {
-            return Ok(await _personService.Filter(firstName, lastName, gender, birthPlace));
+            var filteredPersons = await _service.FilterPersons(name, gender, birthplace);
+            return Ok(filteredPersons);
         }
     }
 }

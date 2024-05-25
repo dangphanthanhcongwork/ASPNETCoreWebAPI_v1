@@ -1,18 +1,10 @@
-using System;
+using WebApplication.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace WebApplication.Models
+namespace WebApplication.DTOs
 {
-    public enum Gender
+    public class PersonDTO
     {
-        Male,
-        Female,
-        Other
-    }
-    public class Person
-    {
-        public Guid Id { get; set; }
-
         [Required]
         public string FirstName { get; set; }
 
